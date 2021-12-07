@@ -1,0 +1,155 @@
+//AUTHOR: Jason Strang
+//COURSE: CPT187
+//PURPOSE: the purpose of this class is to use a persons account within the store.
+//CREATEDATE: 11/29/2021
+package edu.cpt187.strang.exercise6;
+
+import java.util.Scanner;
+import java.io.FileInputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+
+
+//start userAccounts supportive class
+public class UserAccounts 
+{
+	//class attributes
+	private final int RESET_VALUE = 0;
+	private final int MAXIMUM_RECORDS = 50;
+	private final int NOT_FOUND = -1;
+
+	private String[] userNames = new String[MAXIMUM_RECORDS];
+	private String[] passwords = new String[MAXIMUM_RECORDS];
+	private String masterFileName = "";
+	private int recordCount = 0;
+	private int searchedIndex = 0;
+
+	UserAccounts(String borrowedFileName)
+	{
+		masterFileName = borrowedFileName;
+	}
+
+	public void setUserAccountArrays()
+	{
+
+		try
+		{//Start Try
+
+			Scanner infile = new Scanner(new FileInputStream(masterFileName));
+
+			recordCount = RESET_VALUE;
+
+			// start while loop for field assignment
+			while (infile.hasNext() == true && recordCount < MAXIMUM_RECORDS)
+			{
+
+				userNames[recordCount] = infile.next(); // assigns next int to variable
+				passwords[recordCount] = infile.next(); // assigns next String to variable
+				recordCount++; // counts to move through arrays
+			}// end while loop for field assignment
+			infile.close(); // close infile scanner
+		}//End try
+		//start catch 
+		catch(IOException ex)
+		{
+			//file is not found or opened catch is executed
+			recordCount = NOT_FOUND;
+		}// end catch
+	}
+
+	//start setSearchIndex setter
+	public void setSearchedIndex(String borrowedUserName)
+	{
+		//assign search sequence to searched index
+		searchedIndex = getSeqSearch(borrowedUserName);
+	}//end setSearchIndex setter
+
+	//start setSearchIndex setter overloaded
+	public void setSearchedIndex(String borrowedUserName, String borrowedPassword)
+	{
+		//assign search sequence to searched index
+		searchedIndex = getSeqSearch(borrowedUserName);
+
+		//start if statement to test if username is found
+		if (searchedIndex >= RESET_VALUE && getPasswordMatch(borrowedPassword) == false)
+		{
+			//assign searched index not found
+			searchedIndex = NOT_FOUND;
+		}//end if statement
+	}//end setSearchIndex setter overloaded
+
+	//start setWriteOneRecord setter
+	public void setWriteOneRecord(String borrowedUserName, String borrowedPassword)
+	{
+		try
+		{//start try
+			PrintWriter filePW = new PrintWriter (new FileWriter(masterFileName, true));
+			filePW.printf("%s\t%s\t%n",borrowedUserName,borrowedPassword);
+
+			recordCount++;
+			filePW.close();
+		}//end try
+		catch(IOException ex)
+		{//start catch
+			recordCount = NOT_FOUND;
+		}//end catch
+	}//end setWriteOneRecord setter
+
+	//start getSeqSearch getter
+	public int getSeqSearch(String borrowedBorrowedUserName)
+	{
+		//local variables
+		int localIndex = RESET_VALUE;
+		int localFound = NOT_FOUND;
+
+		// start do while 
+		while(localIndex < recordCount)
+		{
+			//start if statement to compare user input to account
+			if(borrowedBorrowedUserName.equalsIgnoreCase(userNames[localIndex]))
+			{
+				localFound = localIndex;
+				localIndex = recordCount;
+			}
+			else
+			{
+				localIndex++;
+			}//end if statement to compare user input to account
+		}
+		//return what was found
+		return localFound;
+	}//end getSeqSearch getter
+
+	//start getPassword Match getter
+	public boolean getPasswordMatch(String borrowedBorrowedPassword)
+	{
+		//return comaprison of input ot account details
+		return passwords[searchedIndex].equalsIgnoreCase(borrowedBorrowedPassword);
+	}//end getPassword Match getter
+
+	//start getFileName getter
+	public String getFileName()
+	{
+		return masterFileName;
+	}//end getFileName getter
+
+	//start getMaximumRecords getter
+	public int getMaximumRecords()
+	{
+		return MAXIMUM_RECORDS;
+	}//end getMaximumRecords getter
+
+	//start getRecordCount getter
+	public int getRecordCount()
+	{
+		return recordCount;
+	}//end getRecordCount getter
+
+	//start getSearchedIndex getter
+	public int getSearchedIndex()
+	{
+		return searchedIndex;
+	}//end getSearchedIndex getter
+
+}//end class
